@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الكلام دا ليكي ي نونتي من قلبي</title>
+  <!-- Google Fonts for Elegant Arabic Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;800&family=Reem+Kufi:wght@500;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #fff0f3;
+      --bg-secondary: #fff6f8;
+      --primary: #ff4d6d;
+      --primary-dark: #c9184a;
+      --accent: #ff85a1;
+      --gold: #d4af37;
+      --rose-gold: #b76e79;
+      --text-main: #590d22;
+      --text-muted: #800f2f;
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --shadow-rose: 0 15px 35px rgba(255, 77, 109, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #ffccd5 0%, #fff0f3 50%, #ffe5ec 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Falling Petals Canvas */
+    #petals-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Container */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.2rem 5rem 1.2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Header Section */
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding: 2.5rem 1.5rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 30px;
+      box-shadow: var(--shadow-rose);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--accent), var(--primary), var(--gold), var(--primary));
+    }
+
+    .subtitle {
+      font-family: 'Reem Kufi', sans-serif;
+      color: var(--primary);
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+
+    .main-title {
+      font-family: 'Amiri', serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 1.2rem;
+      line-height: 1.3;
+    }
+
+    .info-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 0.6rem 1.4rem;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 77, 109, 0.2);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge i {
+      color: var(--primary);
+    }
+
+    .badge.birthday-badge {
+      background: linear-gradient(135deg, #fff0f3, #ffe5ec);
+      border: 1.5px solid var(--accent);
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    /* Counter Section */
+    .counter-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 3rem;
+      box-shadow: var(--shadow-rose);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .counter-title {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    .timer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 1rem;
+    }
+
+    .timer-unit {
+      background: linear-gradient(145deg, #ffffff, #fff0f3);
+      padding: 1rem 0.5rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 133, 161, 0.2);
+      box-shadow: 0 5px 15px rgba(255, 77, 109, 0.05);
+    }
+
+    .timer-value {
+      font-family: 'Reem Kufi', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: block;
+      line-height: 1.1;
+    }
+
+    .timer-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      display: block;
+    }
+
+    /* Timeline & Story Cards */
+    .section-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .section-header h2 {
+      font-family: 'Amiri', serif;
+      font-size: 2.2rem;
+      color: var(--primary-dark);
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-header h2::after {
+      content: '🌸';
+      display: block;
+      font-size: 1.2rem;
+      margin-top: 0.2rem;
+    }
+
+    .cards-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .story-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      padding: 2rem;
+      box-shadow: var(--shadow-rose);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      position: relative;
+      transition: all 0.4s ease;
+    }
+
+    .card-header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 0.4rem 1.2rem;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+    }
+
+    .card-title {
+      font-family: 'Amiri', serif;
+      font-size: 1.6rem;
+      color: var(--primary-dark);
+      margin-bottom: 1rem;
+    }
+
+    /* Locked Overlay & Questions */
+    .locked-content {
+      display: none;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-box {
+      background: rgba(255, 240, 243, 0.7);
+      border-radius: 20px;
+      padding: 1.5rem;
+      border: 1px dashed var(--accent);
+    }
+
+    .question-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 1.2rem;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .option-btn {
+      background: white;
+      border: 2px solid rgba(255, 133, 161, 0.3);
+      padding: 0.9rem 1.2rem;
+      border-radius: 15px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: right;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .option-btn:hover {
+      border-color: var(--primary);
+      background: #fff0f3;
+      transform: translateY(-2px);
+    }
+
+    .option-btn.wrong {
+      background: #ffe6e6;
+      border-color: #ff4d4d;
+      color: #cc0000;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .unlocked-story {
+      background: #ffffff;
+      padding: 1.8rem;
+      border-radius: 20px;
+      border-right: 5px solid var(--primary);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+    }
+
+    .unlocked-story p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+    }
+
+    .poem-box {
+      font-family: 'Amiri', serif;
+      background: linear-gradient(135deg, #fff0f3, #ffe5ec);
+      padding: 1.5rem;
+      border-radius: 15px;
+      text-align: center;
+      font-size: 1.3rem;
+      line-height: 2;
+      color: var(--primary-dark);
+      margin-top: 1rem;
+      border: 1px solid rgba(255, 77, 109, 0.2);
+    }
+
+    /* Music Player Floating Bar */
+    .music-player {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 0.8rem 1.4rem;
+      border-radius: 50px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 100;
+      border: 1.5px solid var(--accent);
+    }
+
+    .music-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3);
+    }
+
+    .music-btn:hover {
+      transform: scale(1.08);
+      background: var(--primary-dark);
+    }
+
+    .music-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .music-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .music-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .main-title {
+        font-size: 2.1rem;
+      }
+      .container {
+        padding: 1rem 0.8rem 5rem 0.8rem;
+      }
+      .story-card {
+        padding: 1.3rem;
+      }
+      .poem-box {
+        font-size: 1.15rem;
+      }
+      .music-player {
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Petals Canvas -->
+  <canvas id="petals-canvas"></canvas>
+
+  <!-- Audio Player (Ramy Sabry Song Placeholder) -->
+  <audio id="bg-music" loop preload="auto">
+    <!-- Spotify / External Audio sample -->
+    <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112199.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Floating Audio Controls -->
+  <div class="music-player">
+    <button class="music-btn" id="music-toggle" onclick="toggleMusic()">
+      <i class="fas fa-music" id="music-icon"></i>
+    </button>
+    <div class="music-info">
+      <span class="music-title">أغنية رومانسية - رامي صبري</span>
+      <span class="music-sub" id="music-status">اضغط للتشغيل 🎵</span>
+    </div>
+  </div>
+
+  <div class="container">
+    
+    <!-- Header Card -->
+    <header class="header">
+      <div class="subtitle">الكلام دا ليكي ي نونتي من قلبي</div>
+      <h1 class="main-title">روضة... أميرة قلبي وحبيبة عمري 💕</h1>
+      <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.6;">
+        موقع خاص جداً معمول بحب عشان يحكي حكايتنا، مواقفنا، وكل التفاصيل السكرة اللي بيننا.
+      </p>
+
+      <div class="info-badges">
+        <div class="badge">
+          <i class="fas fa-calendar-heart"></i>
+          <span>بداية حكايتنا: 31 / 3 / 2025</span>
+        </div>
+        <div class="badge birthday-badge">
+          <i class="fas fa-cake-candles"></i>
+          <span>عيد ميلاد نونتي: 1 / 1 / 2009</span>
+        </div>
+        <div class="badge">
+          <i class="fas fa-rose"></i>
+          <span>عالم الورد والشاورما ❤️</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Live Counter -->
+    <section class="counter-card">
+      <div class="counter-title">
+        <i class="fas fa-hourglass-half" style="color: var(--primary);"></i>
+        الوقت اللي عيشناه سوا وبيزيد كل ثانية بحبنا:
+      </div>
+      <div class="timer-grid">
+        <div class="timer-unit">
+          <span class="timer-value" id="days">0</span>
+          <span class="timer-label">يوم</span>
+        </div>
+        <div class="timer-unit">
+          <span class="timer-value" id="hours">0</span>
+          <span class="timer-label">ساعة</span>
+        </div>
+        <div class="timer-unit">
+          <span class="timer-value" id="minutes">0</span>
+          <span class="timer-label">دقيقة</span>
+        </div>
+        <div class="timer-unit">
+          <span class="timer-value" id="seconds">0</span>
+          <span class="timer-label">ثانية</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Timeline & Interactive Stories -->
+    <section class="section-header">
+      <h2>مواقفنا وحكاياتنا التفاعلية</h2>
+    </section>
+
+    <div class="cards-wrapper">
+
+      <!-- Story 1: موقف الكحكة -->
+      <div class="story-card" id="card-1">
+        <div class="card-header-badge">
+          <i class="fas fa-lock" id="icon-1"></i>
+          <span>الموقف الأول</span>
+        </div>
+        <h3 class="card-title">موقف الكحكة والمكان المميز</h3>
+
+        <!-- Question Gate -->
+        <div class="question-box" id="qbox-1">
+          <div class="question-text">
+            جاوبي على السؤال ده يا نونتي عشان الموقف يتفتح: المكان كان فين لما قولتلك هاتي كحكة ومرضيتيش؟
+          </div>
+          <div class="options-grid">
+            <button class="option-btn" onclick="checkAnswer(1, false, this)">
+              <span>جبل روزهوك</span>
+              <i class="far fa-circle"></i>
+            </button>
+            <button class="option-btn" onclick="checkAnswer(1, true, this)">
+              <span>جبل عماير سكول</span>
+              <i class="far fa-circle"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Unlocked Content -->
+        <div class="locked-content" id="content-1">
+          <div class="unlocked-story">
+            <p>
+              لما قولتلك هاتي كحكه ومرضيتش! والمكان كان في جبل عماير سكول، الموقف ده هيفضل علم في دماغي ومش بنساه أبداً، ومن يومها وأنا عارف إن كل لحظة معاكي ليها طعم تاني خالص يا روضة!
+            </p>
+            <div class="poem-box">
+              "في عيونك أرى دنيتي وكل المنى<br>
+              ومعكِ تبدأ أحلي حكايات الهوى"
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story 2: خدعة السن -->
+      <div class="story-card" id="card-2">
+        <div class="card-header-badge">
+          <i class="fas fa-lock" id="icon-2"></i>
+          <span>الموقف الثاني</span>
+        </div>
+        <h3 class="card-title">خدعة السن والاعتراف اللطيف</h3>
+
+        <!-- Question Gate -->
+        <div class="question-box" id="qbox-2">
+          <div class="question-text">
+            افتكرتي القصة القديمة؟ سننا في القصة القديمة كان كام قبل ما نعترف لبعض بالحقية؟
+          </div>
+          <div class="options-grid">
+            <button class="option-btn" onclick="checkAnswer(2, false, this)">
+              <span>هي 15 وهو 18</span>
+              <i class="far fa-circle"></i>
+            </button>
+            <button class="option-btn" onclick="checkAnswer(2, true, this)">
+              <span>هي 19 وهو 21</span>
+              <i class="far fa-circle"></i>
+            </button>
+            <button class="option-btn" onclick="checkAnswer(2, false, this)">
+              <span>هي 16 وهو 20</span>
+              <i class="far fa-circle"></i>
+            </button>
+            <button class="option-btn" onclick="checkAnswer(2, false, this)">
+              <span>هي 18 وهو 22</span>
+              <i class="far fa-circle"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Unlocked Content -->
+        <div class="locked-content" id="content-2">
+          <div class="unlocked-story">
+            <p>
+              أحلى قصة ضحكنا فيها على بعض! هي كانت قايلة 19 سنة وهي 17، وأنا كنت قايل 21 وأنا 15! ورغم كل ده حبينا بعض بجد واعترفنا لبعض بكل حاجة، وكانت دي أجمل بداية لأحلى حب في الدنيا.
+            </p>
+            <div class="poem-box">
+              "على طريقة رامي صبري لما قال:<br>
+              حبيبتي وبس.. وأجمل حاجة في الأيام<br>
+              معاكي العمر بيحلوّ وبيحقق لي كل أحلام"
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story 3: حاجات بتحبها روضة -->
+      <div class="story-card" id="card-3">
+        <div class="card-header-badge">
+          <i class="fas fa-lock" id="icon-3"></i>
+          <span>الموقف الثالث</span>
+        </div>
+        <h3 class="card-title">عالم روضة والمفضلات 🌸</h3>
+
+        <!-- Question Gate -->
+        <div class="question-box" id="qbox-3">
+          <div class="question-text">
+            سؤال السكر: إيه هي أكتر حاجات بتحبها روضة في الدنيا؟
+          </div>
+          <div class="options-grid">
+            <button class="option-btn" onclick="checkAnswer(3, false, this)">
+              <span>البيتزا واللون الأزرق</span>
+              <i class="far fa-circle"></i>
+            </button>
+            <button class="option-btn" onclick="checkAnswer(3, true, this)">
+              <span>الورد، أغاني رامي صبري، الشاورما، واللون البينك 💖</span>
+              <i class="far fa-circle"></i>
+            </button>
+            <button class="option-btn" onclick="checkAnswer(3, false, this)">
+              <span>الشوكولاتة واللون الأسود</span>
+              <i class="far fa-circle"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Unlocked Content -->
+        <div class="locked-content" id="content-3">
+          <div class="unlocked-story">
+            <p>
+              الورد الجوري، اللون البينك الناعم، ساندوتش الشاورما اللذيذ، وصوت أغاني رامي صبري الدافي... كل التفاصيل دي بتفكرني بيكي وبضحكتك اللي بتنور حياتي!
+            </p>
+            <div class="poem-box">
+              "أنتي كعطر الوردِ في روضتي<br>
+              وأنتي الأغنيةُ التي يتردد صداها في قلبي"
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story 4: أول لقاء والاستيكرات -->
+      <div class="story-card" id="card-4">
+        <div class="card-header-badge">
+          <i class="fas fa-lock" id="icon-4"></i>
+          <span>الموقف الرابع</span>
+        </div>
+        <h3 class="card-title">تحدي أول لقاء 📸</h3>
+
+        <!-- Question Gate -->
+        <div class="question-box" id="qbox-4">
+          <div class="question-text">
+            تتوقعي إيه أول حاجة هعملها لما نتقابل إن شاء الله؟ 😉
+          </div>
+          <div class="options-grid">
+            <button class="option-btn" onclick="checkAnswer(4, false, this)">
+              <span>هجيبلك بوكيه ورد وأسكت</span>
+              <i class="far fa-circle"></i>
+            </button>
+            <button class="option-btn" onclick="checkAnswer(4, false, this)">
+              <span>هنروح ناكل شاورما علطول</span>
+              <i class="far fa-circle"></i>
+            </button>
+            <button class="option-btn" onclick="checkAnswer(4, true, this)">
+              <span>هخليكي تقلدي كل الاستيكرات! 🤪</span>
+              <i class="far fa-circle"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Unlocked Content -->
+        <div class="locked-content" id="content-4">
+          <div class="unlocked-story">
+            <p>
+              صح جداً! أول ما نتقابل هخليكي تقّلدي كل الاستيكرات استيكر استيكر ونضحك سوا زي ما بنعمل دايماً، واللحظة دي هتكون من أحلى لحظات حياتنا!
+            </p>
+            <div class="poem-box">
+              "ضحكتك هي سر سعادتي<br>
+              ولقاؤكِ هو العيدُ الذي أنتظره"
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story 5: الوعد والحلم الأبدي -->
+      <div class="story-card" id="card-5">
+        <div class="card-header-badge">
+          <i class="fas fa-lock" id="icon-5"></i>
+          <span>الموقف الخامس والعهد</span>
+        </div>
+        <h3 class="card-title">حلمنا والوعد الأبدي 💍</h3>
+
+        <!-- Question Gate -->
+        <div class="question-box" id="qbox-5">
+          <div class="question-text">
+            إيه هو الحلم والوعد اللي بيننا للمستقبل؟
+          </div>
